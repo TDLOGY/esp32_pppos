@@ -51,7 +51,7 @@ void main_state_machine(void)
         cntCheckConnect = 0;
         while(!mqtt_connected()){
             vTaskDelay(pdMS_TO_TICKS(1000));
-            if(++cntCheckConnect >= 20){
+            if(++cntCheckConnect >= 60){
                 mainState = MODE_RECONNECT_INIT;
                 break;
             }

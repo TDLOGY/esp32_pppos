@@ -143,10 +143,17 @@ void pppos_task_init(void)
     void *modem_netif_adapter = esp_modem_netif_setup(dte);
     esp_modem_netif_set_default_handlers(modem_netif_adapter, esp_netif);
 
+    uint8_t cnt = 0;
     do
     {
         dce = sim7600_init(dte);
         vTaskDelay(5000 / portTICK_PERIOD_MS);
+
+        if(++cnt >= 10)
+        {
+            cnt = 0;
+            SIM_reset();
+        }
     }
     while (dce == NULL);
 
