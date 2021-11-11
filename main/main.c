@@ -42,6 +42,7 @@ void main_state_machine(void)
     {
     case MODE_START:
         /*  SIM7600 init with PPPOS */
+        led_sys_set_display(LED_CONNECTING);
         pppos_task_init();
         mqtt_init();
         mainState = MODE_CONNECTING;
@@ -61,6 +62,7 @@ void main_state_machine(void)
         {
             ESP_LOGI(TAG, "Connected");
             mainState = MODE_CONNECTED;
+            led_sys_set_display(LED_CONNECTED);
         }
         else
         {

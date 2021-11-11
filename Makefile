@@ -3,6 +3,6 @@
 # project subdirectory.
 #
 
-PROJECT_NAME := iot_4g
+PROJECT_NAME := esp32_sim_pppos
 
 include $(IDF_PATH)/make/project.mk

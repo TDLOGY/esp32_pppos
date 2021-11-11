@@ -110,7 +110,7 @@ void SIM_reset(void)
     gpio_config(&io_conf);
 
     gpio_set_level(15, 0);
-    vTaskDelay(100 / portTICK_PERIOD_MS);
+    vTaskDelay(2000 / portTICK_PERIOD_MS);
     gpio_set_level(15, 1);
 }
 
@@ -149,27 +149,35 @@ void pppos_task_init(void)
         dce = sim7600_init(dte);
         vTaskDelay(5000 / portTICK_PERIOD_MS);
 
-        if(++cnt >= 10)
+        if(++cnt >= 20)
         {
             cnt = 0;
             SIM_reset();
         }
     }
     while (dce == NULL);
-
-    uint32_t rssi = 0, ber = 0;
-    dce->store_profile(dce);
-    /* Get signal quality */
-    dce->get_signal_quality(dce, &rssi, &ber);
-    if(strstr(dce->name, "EC600S")){
-        moduleType = MODULE_QUECTEL;
-    }
-
     /* Print Module ID, Operator, IMEI, IMSI */
     ESP_LOGI(TAG, "Module: %s", dce->name);
     ESP_LOGI(TAG, "Operator: %s", dce->oper);
     ESP_LOGI(TAG, "IMEI: %s", dce->imei);
     ESP_LOGI(TAG, "IMSI: %s", dce->imsi);
+
+    if(strstr(dce->name, "EC600S")){
+        moduleType = MODULE_QUECTEL;
+    }
+    uint32_t rssi = 0, ber = 0;
+
+    /* Get signal quality */
+    for(int i = 0; i < 20; i++){
+        dce->get_signal_quality(dce, &rssi, &ber);
+        if((rssi != 99) && (rssi != 0))
+        {
+            break;
+        }
+        vTaskDelay(1000 / portTICK_PERIOD_MS);
+    }
+    dce->store_profile(dce);
+
     ESP_LOGI(TAG, "rssi: %d, ber: %d", rssi, ber);
 
     /* attach the modem to the network interface */

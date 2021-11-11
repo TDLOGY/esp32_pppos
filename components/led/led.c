@@ -14,11 +14,11 @@
 #include "driver/gpio.h"
 #include "led.h"
 
-#define LED_RED_CONN_PIN       	(17)
-#define LED_GREEN_CONN_PIN      (17)
+#define LED_RED_CONN_PIN       	(18)
+#define LED_GREEN_CONN_PIN      (18)
 
-#define LED_RED_SYS_PIN       	(16)
-#define LED_BLUE_SYS_PIN       	(16)
+#define LED_RED_SYS_PIN       	(2)
+#define LED_BLUE_SYS_PIN       	(2)
 
 #define GPIO_OUTPUT_PIN_SEL ((1UL << LED_BLUE_SYS_PIN) | \
                             (1UL << LED_RED_CONN_PIN) | \
@@ -65,8 +65,8 @@ void leds_init(void)
 
 	xTaskCreate(led_task, "led_task", 1024U, NULL, 7, NULL);
 
-	LEDS_RED_SYS_OFF();
-	LEDS_BLUE_SYS_OFF();
+	LEDS_RED_SYS_ON();
+	LEDS_BLUE_SYS_ON();
 
 	LEDS_RED_CONN_OFF();
 	LEDS_GREEN_CONN_OFF();
@@ -79,11 +79,6 @@ static void led_task(void * param)
 		led_conn_display();
 		led_sys_display();
 
-		if((ledSysDisplayMode == LED_NONE) && 
-			(ledConnDisplayMode == LED_NONE))
-		{
-			vTaskDelay(5000 / portTICK_RATE_MS);	
-		}
 		vTaskDelay(100 / portTICK_RATE_MS);
 	}
 }
