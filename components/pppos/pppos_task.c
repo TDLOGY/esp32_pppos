@@ -174,6 +174,7 @@ void pppos_task_init(void)
         {
             break;
         }
+        ESP_LOGI(TAG, "rssi: %d, ber: %d", rssi, ber);
         vTaskDelay(1000 / portTICK_PERIOD_MS);
     }
     dce->store_profile(dce);
