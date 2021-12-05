@@ -1,6 +1,6 @@
 @echo off
 
-set IDF_PATH="D:\Software\WindowsApp\Develop\esp32\esp-idf-v4.2.2"
+set IDF_PATH="D:\Software\WindowsApp\Develop\esp32\esp-idf-v4.4"
 
 :: The script determines location of Git, Python and ESP-IDF.
 :: Similar result can be achieved by running export.ps1 from ESP-IDF directory.

@@ -584,6 +584,7 @@ esp_err_t esp_modem_start_ppp(modem_dte_t *dte)
     esp_modem_dte_t *esp_dte = __containerof(dte, esp_modem_dte_t, parent);
     /* Set PDP Context */
     MODEM_CHECK(dce->define_pdp_context(dce, 1, "IP", "") == ESP_OK, "set MODEM APN failed", err);
+    // MODEM_CHECK(dce->define_pdp_context(dce, 1, "IP", "v-internet") == ESP_  OK, "set MODEM APN failed", err);
     /* Enter PPP mode */
     MODEM_CHECK(dte->change_mode(dte, MODEM_PPP_MODE) == ESP_OK, "enter ppp mode failed", err);
 

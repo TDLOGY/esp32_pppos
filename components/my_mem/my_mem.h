@@ -21,7 +21,7 @@ typedef struct
     uint32_t testData;
 }WorkingData_t;
 
-#define STORAGE_FLAG_VALID          (0x5A5A5A5A)
+#define STORAGE_FLAG_VALID          (0x5A5A5AA5)
 
 extern const DeviceStore_t deviceStoreDefault;
 extern WorkingData_t workingData;

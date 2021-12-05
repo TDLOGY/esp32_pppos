@@ -43,7 +43,6 @@ void https_ota_task(void *pvParameter)
     esp_err_t ota_finish_err = ESP_OK;
     esp_http_client_config_t config = {
         .url = _url,
-        .cert_pem = deviceStore.CA_root,
         .timeout_ms = 5000,
         .keep_alive_enable = true,
     };

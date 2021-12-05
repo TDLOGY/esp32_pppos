@@ -11,13 +11,12 @@
 #include "driver/gpio.h"
 #include "pppos_task.h"
 
-#define TIMEOUT_PPP_DISCONNECTED    (60000U)            // 60s
-#define TIMEOUT_PPP_CONNECTED       (20000U)            // 60s
+#define SIM_POWER_EN_PIN            15
+#define SIM_POWER_TX_PIN            17
+#define SIM_POWER_RX_PIN            16
 
-typedef enum{
-    MODULE_SIMCOM = 0,
-    MODULE_QUECTEL = 1,
-}ModuleType_t;
+#define TIMEOUT_PPP_DISCONNECTED    (60000U)            // 60s
+#define TIMEOUT_PPP_CONNECTED       (60000U)            // 60s
 
 static const char *TAG = "pppos";
 
@@ -26,7 +25,6 @@ static const int CONNECT_BIT = BIT0;
 static const int STOP_BIT = BIT1;
 static const int DISCONNECT_BIT = BIT2;
 static volatile bool pppos_connected = false;
-static ModuleType_t moduleType = MODULE_SIMCOM;
 static modem_dce_t *dce = NULL;
 
 static void modem_event_handler(void *event_handler_arg, esp_event_base_t event_base, int32_t event_id, void *event_data)
@@ -101,17 +99,18 @@ static void on_ip_event(void *arg, esp_event_base_t event_base,
 
 void SIM_reset(void)
 {
+    ESP_LOGI(TAG, "SIM Power Reset");
     gpio_config_t io_conf;
     io_conf.intr_type = GPIO_PIN_INTR_DISABLE;
     io_conf.mode = GPIO_MODE_OUTPUT;
-    io_conf.pin_bit_mask = 1 << 15;
+    io_conf.pin_bit_mask = 1 << SIM_POWER_EN_PIN;
     io_conf.pull_down_en = 0;
     io_conf.pull_up_en = 0;
     gpio_config(&io_conf);
 
-    gpio_set_level(15, 0);
+    gpio_set_level(SIM_POWER_EN_PIN, 0);
     vTaskDelay(2000 / portTICK_PERIOD_MS);
-    gpio_set_level(15, 1);
+    gpio_set_level(SIM_POWER_EN_PIN, 1);
 }
 
 void pppos_task_init(void)
@@ -127,8 +126,8 @@ void pppos_task_init(void)
 
     /* create dte object */
     esp_modem_dte_config_t config = ESP_MODEM_DTE_DEFAULT_CONFIG();
-    config.tx_io_num = 17;
-    config.rx_io_num = 16;
+    config.tx_io_num = SIM_POWER_TX_PIN;
+    config.rx_io_num = SIM_POWER_RX_PIN;
     config.event_task_stack_size = CONFIG_EXAMPLE_MODEM_UART_EVENT_TASK_STACK_SIZE;
     modem_dte_t *dte = esp_modem_dte_init(&config);
 
@@ -162,24 +161,19 @@ void pppos_task_init(void)
     ESP_LOGI(TAG, "IMEI: %s", dce->imei);
     ESP_LOGI(TAG, "IMSI: %s", dce->imsi);
 
-    if(strstr(dce->name, "EC600S")){
-        moduleType = MODULE_QUECTEL;
-    }
     uint32_t rssi = 0, ber = 0;
 
     /* Get signal quality */
     for(int i = 0; i < 20; i++){
         dce->get_signal_quality(dce, &rssi, &ber);
+        ESP_LOGI(TAG, "rssi: %d, ber: %d", rssi, ber);
         if((rssi != 99) && (rssi != 0))
         {
             break;
         }
-        ESP_LOGI(TAG, "rssi: %d, ber: %d", rssi, ber);
         vTaskDelay(1000 / portTICK_PERIOD_MS);
     }
     dce->store_profile(dce);
-
-    ESP_LOGI(TAG, "rssi: %d, ber: %d", rssi, ber);
 
     /* attach the modem to the network interface */
     esp_netif_attach(esp_netif, modem_netif_adapter);

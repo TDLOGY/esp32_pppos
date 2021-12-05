@@ -20,7 +20,7 @@ DeviceStore_t deviceStore;
 const DeviceStore_t deviceStoreDefault = {
     .store_flag = STORAGE_FLAG_VALID,
     .domain = "test",
-    .mqtt_url = "mqtt://test.mosquitto.org:1883",
+    .mqtt_url = "mqtt://broker.hivemq.com:1883",
     .CA_root =  "",
     .cert =     "",
     .priv_key =  "",
